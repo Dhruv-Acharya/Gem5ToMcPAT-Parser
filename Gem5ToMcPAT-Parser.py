@@ -123,22 +123,22 @@ def prepareTemplate(outputFile):
             coreElemCopy = copy.deepcopy(coreElem)
             for coreCounter in range(numCores):
                 coreElem.attrib["name"] = "core" + str(coreCounter)
-                coreElem.attrib["id"] = "core" + str(coreCounter)
+                coreElem.attrib["id"] = "system.core" + str(coreCounter)
                 for coreChild in coreElem:
                     childId = coreChild.attrib.get("id")
                     childValue = coreChild.attrib.get("value")
                     if isinstance(childId, basestring) and "core" in childId:
                         childId = childId.replace("core", "core" + str(coreCounter))
-                    if isinstance(childValue, basestring) and "cpu." in childValue and childValue.split('.')[0] == "stats":
+                    if isinstance(childValue, basestring) and "cpu." in childValue and "stats" in childValue.split('.')[0]:
                         childValue = childValue.replace("cpu." , "cpu" + str(coreCounter)+ ".")
-                    if isinstance(childValue, basestring) and "cpu." in childValue and childValue.split('.')[0] == "config":
+                    if isinstance(childValue, basestring) and "cpu." in childValue and "config" in childValue.split('.')[0]:
                         childValue = childValue.replace("cpu." , "cpu." + str(coreCounter)+ ".")
                     if len(list(coreChild)) is not 0:
                         for level2Child in coreChild:
                             level2ChildValue = level2Child.attrib.get("value")
-                            if isinstance(level2ChildValue, basestring) and "cpu." in level2ChildValue and level2ChildValue.split('.')[0] == "stats":
+                            if isinstance(level2ChildValue, basestring) and "cpu." in level2ChildValue and "stats" in level2ChildValue.split('.')[0]:
                                 level2ChildValue = level2ChildValue.replace("cpu." , "cpu" + str(coreCounter)+ ".")
-                            if isinstance(level2ChildValue, basestring) and "cpu." in level2ChildValue and level2ChildValue.split('.')[0] == "config":
+                            if isinstance(level2ChildValue, basestring) and "cpu." in level2ChildValue and "config" in level2ChildValue.split('.')[0]:
                                 level2ChildValue = level2ChildValue.replace("cpu." , "cpu." + str(coreCounter)+ ".")
                             level2Child.attrib["value"] = level2ChildValue
                     if isinstance(childId, basestring):
@@ -149,8 +149,29 @@ def prepareTemplate(outputFile):
                 coreElem = copy.deepcopy(coreElemCopy)
                 elemCounter += 1
             root[0][0].remove(child)
+            elemCounter -= 1
+
+        # remove a L2 template element and replace it with number of L2 template elements
+        if child.attrib.get("name") == "L2":
+            l2Elem = copy.deepcopy(child)
+            l2ElemCopy = copy.deepcopy(l2Elem)
+            for l2Counter in range(numL2):
+                l2Elem.attrib["name"] = "L2" + str(l2Counter)
+                l2Elem.attrib["id"] = "system.L2" + str(l2Counter)
+                for l2Child in l2Elem:
+                    childValue = l2Child.attrib.get("value")
+                    if isinstance(childValue, basestring) and "cpu." in childValue and "stats" in childValue.split('.')[0]:
+                        childValue = childValue.replace("cpu." , "cpu" + str(l2Counter)+ ".")
+                    if isinstance(childValue, basestring) and "cpu." in childValue and "config" in childValue.split('.')[0]:
+                        childValue = childValue.replace("cpu." , "cpu." + str(l2Counter)+ ".")
+                    if isinstance(childValue, basestring):
+                        l2Child.attrib["value"] = childValue
+                root[0][0].insert(elemCounter, l2Elem)
+                l2Elem = copy.deepcopy(l2ElemCopy)
+                elemCounter += 1
+            root[0][0].remove(child)
+
             # for i in range(numCores):
-                
             # for core in list(child.iter()):
             #     temp = core.attrib.get('value')
             #     if isinstance(temp, basestring) and "cpu." in temp and temp.split('.')[0] == "stats":
@@ -160,39 +181,38 @@ def prepareTemplate(outputFile):
             # child.attrib['value'] = value
             # print child.attrib.get("value")
     prettify(root)
-    templateMcpat.write(outputFile)
+    #templateMcpat.write(outputFile)
+
+def getConfValue(confStr):
+    spltConf = re.split('\.', confStr)
+    currConf = config
+    currHierarchy = ""
+    for x in spltConf:
+        currHierarchy += x
+        if x.isdigit():
+            currConf = currConf[int(x)] 
+        elif x in currConf:
+            # if isinstance(currConf, types.ListType):
+            #     #this is mostly for system.cpu* as system.cpu is an array
+            #     #This could be made better
+            #     if x not in currConf[0]:
+            #         print "%s does not exist in config" % currHierarchy 
+            #     else:
+            #         currConf = currConf[0][x]
+            # else:
+            #         print "***WARNING: %s does not exist in config.***" % currHierarchy 
+            #         print "\t Please use the right config param in your McPAT template file"
+        # else:
+            currConf = currConf[x]
+        currHierarchy += "."
+    return currConf
 
 # def getConfValue(confStr):
 #     spltConf = re.split('\.', confStr)
 #     currConf = config
-#     currHierarchy = ""
-#     for x in spltConf:
-#         print x
-#         currHierarchy += x
-#         if x not in currConf:
-#             if isinstance(currConf, types.ListType):
-#                 #this is mostly for system.cpu* as system.cpu is an array
-#                 #This could be made better
-#                 if x not in currConf[0]:
-#                     print "%s does not exist in config" % currHierarchy 
-#                 else:
-#                     currConf = currConf[0][x]
-#             else:
-#                     print "***WARNING: %s does not exist in config.***" % currHierarchy 
-#                     print "\t Please use the right config param in your McPAT template file"
-#         else:
-#             currConf = currConf[x]
-#         currHierarchy += "."
+#     for index in spltConf:
+#         currConf = currConf[index]
 #     return currConf
-
-def getConfValue(confStr):
-    confList = confStr.split('.')
-    currConf = config
-    for index in confList:
-        if index.isdigit():
-            index = int(index)
-        currConf = currConf[index]
-    return currConf
 
 def dumpMcpatOut(outFile):
     rootElem = templateMcpat.getroot()
