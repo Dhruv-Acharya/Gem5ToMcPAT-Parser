@@ -379,17 +379,17 @@
       <param name="number_mcs" value="0"/>
       <!-- current McPAT only supports homogeneous memory controllers -->
       <param name="memory_channels_per_mc" value="config.system.mem_ctrls.channels"/>
-      <param name="number_ranks" value="(config.system.mem_ctrls.channels * config.system.mem_ctrls.ranks_per_channel)"/>
-      <param name="withPHY" value="0"/>
+      <param name="number_ranks" value="2"/>
+      <param name="withPHY" value="config.system.mem_ctrls.ranks_per_channel"/>
       <!-- # of ranks of each channel-->
       <param name="req_window_size_per_channel" value="32"/>
       <param name="IO_buffer_size_per_channel" value="32"/>
       <param name="databus_width" value="128"/>
       <param name="addressbus_width" value="51"/>
       <!-- McPAT will add the control bus width to the address bus width automatically -->
-      <stat name="memory_accesses" value="33333"/>
-      <stat name="memory_reads" value="16667"/>
-      <stat name="memory_writes" value="16667"/>
+      <stat name="memory_accesses" value="(stats.system.mem_ctrls.readReqs + system.mem_ctrls.writeReqs)"/>
+      <stat name="memory_reads" value="stats.system.mem_ctrls.readReqs"/>
+      <stat name="memory_writes" value="system.mem_ctrls.writeReqs"/>
       <!-- McPAT does not track individual mc, instead, it takes the total accesses and calculate 
       the average power per MC or per channel. This is sufficient for most application. 
       Further track down can be easily added in later versions. -->
