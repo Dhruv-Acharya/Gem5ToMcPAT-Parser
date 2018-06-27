@@ -98,7 +98,14 @@ def readMcpatFile(templateFile):
 
 def prepareTemplate(outputFile):
     numCores = len(config["system"]["cpu"])
-    numL2 = numCores
+    privateL2 = config["system"]["cpu"][0].has_key('l2cache')
+    sharedL2 = config["system"].has_key('l2')
+    if privateL2:
+        numL2 = numCores
+    elif sharedL2:
+        numL2 = 1
+    else:
+        numL2 = 0
     elemCounter = 0
     root = templateMcpat.getroot()
     for child in root[0][0]:
@@ -108,6 +115,12 @@ def prepareTemplate(outputFile):
             child.attrib['value'] = str(numCores)
         if child.attrib.get("name") == "number_of_L2s":
             child.attrib['value'] = str(numL2)
+        if child.attrib.get("name") == "Private_L2":
+            if sharedL2:
+                Private_L2 = str(0)
+            else:
+                Private_L2 = str(1)
+            child.attrib['value'] = Private_L2
         temp = child.attrib.get('value')
 
         # to consider all the cpus in total cycle calculation
@@ -151,39 +164,48 @@ def prepareTemplate(outputFile):
             root[0][0].remove(child)
             elemCounter -= 1
 
+        # # remove a L2 template element and replace it with the private L2 template elements
+        # if child.attrib.get("name") == "L2.shared":
+        #     print child
+        #     if sharedL2:
+        #         child.attrib["name"] = "L20"
+        #         child.attrib["id"] = "system.L20"
+        #     else:
+        #         root[0][0].remove(child)
+
         # remove a L2 template element and replace it with number of L2 template elements
         if child.attrib.get("name") == "L2":
-            l2Elem = copy.deepcopy(child)
-            l2ElemCopy = copy.deepcopy(l2Elem)
-            for l2Counter in range(numL2):
-                l2Elem.attrib["name"] = "L2" + str(l2Counter)
-                l2Elem.attrib["id"] = "system.L2" + str(l2Counter)
-                for l2Child in l2Elem:
+            if privateL2:
+                l2Elem = copy.deepcopy(child)
+                l2ElemCopy = copy.deepcopy(l2Elem)
+                for l2Counter in range(numL2):
+                    l2Elem.attrib["name"] = "L2" + str(l2Counter)
+                    l2Elem.attrib["id"] = "system.L2" + str(l2Counter)
+                    for l2Child in l2Elem:
+                        childValue = l2Child.attrib.get("value")
+                        if isinstance(childValue, basestring) and "cpu." in childValue and "stats" in childValue.split('.')[0]:
+                            childValue = childValue.replace("cpu." , "cpu" + str(l2Counter)+ ".")
+                        if isinstance(childValue, basestring) and "cpu." in childValue and "config" in childValue.split('.')[0]:
+                            childValue = childValue.replace("cpu." , "cpu." + str(l2Counter)+ ".")
+                        if isinstance(childValue, basestring):
+                            l2Child.attrib["value"] = childValue
+                    root[0][0].insert(elemCounter, l2Elem)
+                    l2Elem = copy.deepcopy(l2ElemCopy)
+                    elemCounter += 1
+                root[0][0].remove(child)
+            else:
+                child.attrib["name"] = "L20"
+                child.attrib["id"] = "system.L20"
+                for l2Child in child:
                     childValue = l2Child.attrib.get("value")
-                    if isinstance(childValue, basestring) and "cpu." in childValue and "stats" in childValue.split('.')[0]:
-                        childValue = childValue.replace("cpu." , "cpu" + str(l2Counter)+ ".")
-                    if isinstance(childValue, basestring) and "cpu." in childValue and "config" in childValue.split('.')[0]:
-                        childValue = childValue.replace("cpu." , "cpu." + str(l2Counter)+ ".")
-                    if isinstance(childValue, basestring):
-                        l2Child.attrib["value"] = childValue
-                root[0][0].insert(elemCounter, l2Elem)
-                l2Elem = copy.deepcopy(l2ElemCopy)
-                elemCounter += 1
-            root[0][0].remove(child)
+                    if isinstance(childValue, basestring) and "cpu.l2cache." in childValue:
+                        childValue = childValue.replace("cpu.l2cache." , "l2.")
 
-            # for i in range(numCores):
-            # for core in list(child.iter()):
-            #     temp = core.attrib.get('value')
-            #     if isinstance(temp, basestring) and "cpu." in temp and temp.split('.')[0] == "stats":
-            # value = "(" + temp.replace("cpu.", "cpu0.") + ")"
-            # for i in range(1, numCores):
-            #     value = value + " + (" + temp.replace("cpu.", "cpu"+str(i)+".") +")"
-            # child.attrib['value'] = value
-            # print child.attrib.get("value")
     prettify(root)
     #templateMcpat.write(outputFile)
 
 def getConfValue(confStr):
+    print confStr
     spltConf = re.split('\.', confStr)
     currConf = config
     currHierarchy = ""
