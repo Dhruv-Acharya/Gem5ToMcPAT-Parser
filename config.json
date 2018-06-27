@@ -114,7 +114,7 @@
         "clk_domain": {
             "name": "clk_domain", 
             "clock": [
-                833
+                1000
             ], 
             "init_perf_level": 0, 
             "voltage_domain": "system.voltage_domain", 
@@ -166,7 +166,7 @@
         "cpu_clk_domain": {
             "name": "cpu_clk_domain", 
             "clock": [
-                500
+                769
             ], 
             "init_perf_level": 0, 
             "voltage_domain": "system.cpu_voltage_domain", 
@@ -294,7 +294,7 @@
                         "pid": 100, 
                         "kvmInSE": false, 
                         "cxx_class": "LiveProcess", 
-                        "executable": "./matmul_serial_normal3loops_X86.out", 
+                        "executable": "./qsort_small_X86.out", 
                         "drivers": [], 
                         "system": "system", 
                         "gid": 100, 
@@ -303,15 +303,15 @@
                         "input": "cin", 
                         "ppid": 99, 
                         "type": "LiveProcess", 
-                        "cwd": "/home/faculty/PhDResearch/ArchitectureAnalysis/SourceCode/MatrixMultiplication/Matrix_Multiplication_Serial_3_Normal_Loops", 
+                        "cwd": "/home/201791601/PhDResearch/ArchitectureAnalysis/SourceCode/MiBench/automotive/qsort", 
                         "simpoint": 0, 
                         "euid": 100, 
                         "path": "system.cpu0.workload", 
                         "max_stack_size": 67108864, 
                         "name": "workload", 
                         "cmd": [
-                            "./matmul_serial_normal3loops_X86.out", 
-                            "250"
+                            "./qsort_small_X86.out", 
+                            "qsort2000.dat"
                         ], 
                         "errout": "cerr", 
                         "useArchPT": false, 

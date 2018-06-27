@@ -246,6 +246,7 @@ def dumpMcpatOut(outFile):
                 if allStats[i] in stats:
                     expr = re.sub('stats.%s' % allStats[i], stats[allStats[i]], expr)
                 else:
+                    expr = re.sub('stats.%s' % allStats[i], str(1), expr)
                     print "***WARNING: %s does not exist in stats***" % allStats[i]
                     print "\t Please use the right stats in your McPAT template file"
 
