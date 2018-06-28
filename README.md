@@ -36,18 +36,18 @@ Parser requires [python 2.7](https://www.python.org/download/releases/2.7/) to r
 ```sh
 $ python Gem5ToMcPAT-Parser.py -c config.json -s stats.txt -t template.xml
 ```
+### Credits
 
+It uses some of the work from a different author:
+
+* [Daya Khudia] - template and some functions has been derived from this repository and updated
 
 License
 ----
 
 MIT
 
-### Credits
 
-It uses some of the work from a different author:
-
-* [Daya Khudia] - template and some functions has been derived from this repository and updated
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
