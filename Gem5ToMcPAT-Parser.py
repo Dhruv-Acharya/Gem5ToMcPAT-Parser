@@ -205,7 +205,6 @@ def prepareTemplate(outputFile):
     #templateMcpat.write(outputFile)
 
 def getConfValue(confStr):
-    print confStr
     spltConf = re.split('\.', confStr)
     currConf = config
     currHierarchy = ""

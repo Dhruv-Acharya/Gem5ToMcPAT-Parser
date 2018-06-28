@@ -375,7 +375,7 @@
       <!-- 0 means using ITRS default vdd -->
       <param name="power_gating_vcc" value="-1"/>
       <!-- "-1" means using default power gating virtual power supply voltage constrained by technology and computed automatically -->
-      <param name="peak_transfer_rate" value="stats.system.mem_ctrls.peakBW"/>
+      <param name="peak_transfer_rate" value="1200"/>
       <!--MB/S-->
       <param name="block_size" value="64"/>
       <!--B-->
@@ -392,7 +392,7 @@
       <!-- McPAT will add the control bus width to the address bus width automatically -->
       <stat name="memory_accesses" value="(stats.system.mem_ctrls.readReqs + stats.system.mem_ctrls.writeReqs)"/>
       <stat name="memory_reads" value="stats.system.mem_ctrls.readReqs"/>
-      <stat name="memory_writes" value="ststs.system.mem_ctrls.writeReqs"/>
+      <stat name="memory_writes" value="stats.system.mem_ctrls.writeReqs"/>
       <!-- McPAT does not track individual mc, instead, it takes the total accesses and calculate 
       the average power per MC or per channel. This is sufficient for most application. 
       Further track down can be easily added in later versions. -->
