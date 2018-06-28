@@ -140,6 +140,12 @@ def prepareTemplate(outputFile):
                 for coreChild in coreElem:
                     childId = coreChild.attrib.get("id")
                     childValue = coreChild.attrib.get("value")
+                    childName = coreChild.attrib.get("name")
+                    if isinstance(childName, basestring) and childName == "x86":
+                        if config["system"]["cpu"][coreCounter]["isa"][0]["type"] == "X86ISA":
+                            childValue = "1"
+                        else:
+                            childValue = "0"
                     if isinstance(childId, basestring) and "core" in childId:
                         childId = childId.replace("core", "core" + str(coreCounter))
                     if isinstance(childValue, basestring) and "cpu." in childValue and "stats" in childValue.split('.')[0]:
